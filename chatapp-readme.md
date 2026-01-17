@@ -3,7 +3,7 @@
 A modern, real-time chat application built with .NET 9, React, TypeScript, SignalR, and PostgreSQL. Features Google OAuth authentication and persistent message storage.
 
 ![ChatApp](https://img.shields.io/badge/Chat-Real--Time-blue)
-![.NET](https://img.shields.io/badge/.NET-9.0-purple)
+![.NET](https://img.shields.io/badge/.NET-8.0-purple)
 ![React](https://img.shields.io/badge/React-18-blue)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue)
@@ -22,7 +22,7 @@ A modern, real-time chat application built with .NET 9, React, TypeScript, Signa
 ## Tech Stack
 
 ### Backend
-- **.NET 9.0** - Modern web framework
+- **.NET 8.0** - Modern web framework
 - **ASP.NET Core Web API** - RESTful API endpoints
 - **SignalR** - Real-time WebSocket communication
 - **Entity Framework Core** - ORM for database operations
@@ -42,7 +42,7 @@ A modern, real-time chat application built with .NET 9, React, TypeScript, Signa
 
 Before you begin, ensure you have the following installed:
 
-- [.NET 9 SDK](https://dotnet.microsoft.com/download) (9.0 or later)
+- [.NET 8 SDK](https://dotnet.microsoft.com/download) (8.0 or later)
 - [Node.js](https://nodejs.org/) (18.0 or later)
 - [PostgreSQL](https://www.postgresql.org/download/) (14.0 or later)
 - [Git](https://git-scm.com/downloads)
