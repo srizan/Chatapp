@@ -6,8 +6,8 @@ import { useAuth } from '../hooks/useAuth';
 import './Chat.css';
 
 const config: ChatConfig = {
-  apiUrl: 'http://localhost:5296/api',
-  hubUrl: 'http://localhost:5296/chathub',
+  apiUrl: import.meta.env.VITE_API_URL || 'http://localhost:5296/api',
+  hubUrl: import.meta.env.VITE_API_URL?.replace('/api', '/chathub') || 'http://localhost:5296/chathub',
 };
 
 function Chat() {
@@ -28,6 +28,8 @@ function Chat() {
   useEffect(() => {
     const loadMessages = async () => {
       try {
+        console.log(config.apiUrl);
+        console.log(config.hubUrl);
         const response = await axios.get(`${config.apiUrl}/messages`);
         setMessages(response.data);
       } catch (error) {
@@ -139,8 +141,7 @@ return (
           className={`message ${msg.user?.username === user.username ? 'own-message' : 'other-message'}`}
         >
           <div className="message-header">
-            {/* <span className="message-user">{msg.user?.username || 'Unknown'}</span> */}
-            <span className="message-user">{msg.user?.email || 'Unknown'}</span>
+            <span className="message-user">{msg.user?.username || 'Unknown'}</span>
             <span className="message-time">{formatTime(msg.sentAt)}</span>
           </div>
           <div className="message-content">{msg.content}</div>

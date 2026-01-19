@@ -39,7 +39,7 @@ public class ChatHub : Hub
         await _context.SaveChangesAsync();
 
         // Broadcast to all clients
-        await Clients.All.SendAsync("ReceiveMessage", username,email, message, msg.SentAt);
+        await Clients.All.SendAsync("ReceiveMessage", username, message, msg.SentAt);
     }
 
     // public async Task JoinChat(string username)

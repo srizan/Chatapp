@@ -1,10 +1,11 @@
 import './Login.css';
 
-const API_URL = 'http://localhost:5296/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5296/api';
 
 function Login() {
   const handleGoogleLogin = () => {
-    window.location.href = `${API_URL}/auth/google-login`;
+    const origin = window.location.origin;
+    window.location.href = `${API_URL}/auth/google-login?returnUrl=${encodeURIComponent(origin)}`;
   };
 
   return (

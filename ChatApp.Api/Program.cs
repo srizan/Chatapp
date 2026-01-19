@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.DataProtection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +26,28 @@ builder.Services.AddScoped<JwtService>();
 builder.Services.AddDbContext<ChatDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(@"./keys"))
+    .SetApplicationName("ChatApp");
+
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    options.MinimumSameSitePolicy = SameSiteMode.Lax;
+    options.Secure = CookieSecurePolicy.None; // For development with tunnels
+});
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.None; // For development
+});
+
+builder.Services.Configure<ForwardedHeadersOptions>(options => 
+{ 
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedHost | ForwardedHeaders.XForwardedProto; 
+    options.KnownNetworks.Clear(); 
+    options.KnownProxies.Clear();
+});
 // Add Authentication
 builder.Services.AddAuthentication(options =>
 {
@@ -76,12 +100,23 @@ builder.Services.AddAuthentication(options =>
 // Add CORS policy
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowReactApp", policy =>
+    // options.AddPolicy("AllowReactApp", policy =>
+    // {
+    //     policy.WithOrigins("http://localhost:5173") // Vite's default port
+    //           .AllowAnyMethod()
+    //           .AllowAnyHeader()
+    //           .AllowCredentials(); // Important for SignalR
+    // });
+
+      options.AddPolicy("AllowAll", builder =>
     {
-        policy.WithOrigins("http://localhost:5173") // Vite's default port
-              .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials(); // Important for SignalR
+        builder.WithOrigins(
+                   "http://localhost:5173",
+                   "https://heaven-louise-motor-eval.trycloudflare.com"
+               )
+               .AllowCredentials()
+               .AllowAnyMethod()
+               .AllowAnyHeader();
     });
 });
 
@@ -95,10 +130,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors("AllowReactApp");
+app.UseCors("AllowAll");
 
 //app.UseHttpsRedirection();
-
+app.UseForwardedHeaders(new ForwardedHeadersOptions { 
+    ForwardedHeaders = ForwardedHeaders.XForwardedHost | ForwardedHeaders.XForwardedProto 
+    });
 app.UseAuthentication();
 app.UseAuthorization();
 

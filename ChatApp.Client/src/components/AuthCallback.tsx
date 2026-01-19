@@ -11,6 +11,7 @@ function AuthCallback() {
     const token = searchParams.get('token');
     
     if (token) {
+      localStorage.setItem('chatapp_token', token);
       login(token).then(() => {
         navigate('/');
       });

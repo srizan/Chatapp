@@ -6,6 +6,7 @@ using ChatApp.Models;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace ChatApp.Api.Controllers;
 
@@ -16,19 +17,24 @@ public class AuthController : ControllerBase
     private readonly ChatDbContext _context;
     private readonly JwtService _jwtService;
 
-    public AuthController(ChatDbContext context, JwtService jwtService)
+    private readonly IConfiguration _configuration;
+
+    public AuthController(ChatDbContext context, JwtService jwtService, IConfiguration configuration)
     {
         _context = context;
         _jwtService = jwtService;
+        _configuration = configuration;
     }
 
     [HttpGet("google-login")]
-    public IActionResult GoogleLogin()
+    public IActionResult GoogleLogin(string returnUrl)
     {
-        var properties = new AuthenticationProperties
-        {
-            RedirectUri = Url.Action(nameof(GoogleCallback))
+         var properties = new AuthenticationProperties 
+        { 
+            RedirectUri = Url.Action("GoogleCallback"),
         };
+        properties.Items["returnUrl"] = returnUrl ?? "http://localhost:5173";
+        
         return Challenge(properties, GoogleDefaults.AuthenticationScheme);
     }
 
@@ -82,9 +88,13 @@ public class AuthController : ControllerBase
         }
         // Generate JWT token
         var token = _jwtService.GenerateToken(user);
+        Console.WriteLine("Generated JWT Token: " + token);
+        
+        var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+    
+        var returnUrl = result.Properties?.Items["returnUrl"] ?? "http://localhost:5173";
 
-        // Redirect to frontend with token
-        return Redirect($"http://localhost:5173/auth/callback?token={token}");
+        return Redirect($"{returnUrl}/auth/callback?token={token}");
     }
 
     [HttpGet("verify")]

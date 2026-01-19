@@ -16,7 +16,7 @@ export const AuthContext = createContext<AuthContextType>({
   isLoading: true
 });
 
-const API_URL = 'http://localhost:5296/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5296/api';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState(null);
